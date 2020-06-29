@@ -24,6 +24,6 @@ class WritableSuite extends AnyFlatSpec with matchers.should.Matchers {
 
 
   "Writable" should "write delta scd2 table" in {
-    df.write(DeltaScd2Table("", ""))
+    df.writeData(DeltaScd2Table("", "")).isLeft shouldBe true
   }
 }

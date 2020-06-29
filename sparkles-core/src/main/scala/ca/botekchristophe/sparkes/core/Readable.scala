@@ -8,27 +8,30 @@ package ca.botekchristophe.sparkes.core
 
 import java.time.LocalDateTime
 
+import cats.implicits._
 import org.apache.spark.sql.{DataFrame, SparkSession}
 
+import scala.util.Try
+
 trait Readable[A] {
-  def read(a: A,
+  def readData(a: A,
            from: LocalDateTime = LocalDateTime.MIN,
-           to: LocalDateTime = LocalDateTime.MAX): DataFrame
+           to: LocalDateTime = LocalDateTime.MAX): Either[String, DataFrame]
 }
 
 object Readable {
 
   implicit val deltaTableScd2CanBeRead: Readable[DeltaScd2Table] = new Readable[DeltaScd2Table] {
-    override def read(a: DeltaScd2Table, from: LocalDateTime, to: LocalDateTime): DataFrame = {
-      SparkSession.active.read.format("delta").load(a.name)
+    override def readData(a: DeltaScd2Table, from: LocalDateTime, to: LocalDateTime): Either[String, DataFrame] = {
+      Try(SparkSession.active.read.format("delta").load(a.name)).toEither.leftMap(_.getMessage)
     }
   }
 
   implicit class ReadableImplicits[B](spark: SparkSession) {
-    def read(b: B,
+    def readData(b: B,
              from: LocalDateTime = LocalDateTime.MIN,
-             to: LocalDateTime = LocalDateTime.MAX)(implicit read: Readable[B]): DataFrame = {
-      read.read(b, from, to)
+             to: LocalDateTime = LocalDateTime.MAX)(implicit read: Readable[B]): Either[String, DataFrame] = {
+      read.readData(b, from, to)
     }
   }
 }
