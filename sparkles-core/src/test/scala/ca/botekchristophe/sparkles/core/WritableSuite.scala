@@ -1,5 +1,5 @@
 /**
- * Copyright (C) 2020-2020 the original author or authors.
+ * Copyright (C) 2020 Christophe Botek or Sparkles contributors.
  * See the LICENCE.txt file distributed with this work for additional
  * information regarding copyright ownership.
  */
@@ -24,6 +24,6 @@ class WritableSuite extends AnyFlatSpec with matchers.should.Matchers {
 
 
   "Writable" should "write delta scd2 table" in {
-    df.writeData(DeltaScd2Table("", "")).isLeft shouldBe true
+    df.writeData(DeltaScd2Table("", "", Set())).isLeft shouldBe true
   }
 }
