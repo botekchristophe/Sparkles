@@ -6,6 +6,8 @@
 
 package ca.botekchristophe.sparkes.core
 
+import ca.botekchristophe.sparkes.core.datasource.{Format, Formats}
+
 trait DataSource {
   val name: String
   val dependencies: Set[DataSource]
@@ -19,31 +21,6 @@ trait DataTable extends DataSource {
 
 trait DataStream extends DataSource {
   val topic: String
-}
-
-trait DataFile extends DataSource {
-
-  val sourceName: String
-  val domainName: String
-  val readOptions: Map[String, String]
-  val writeOptions: Map[String, String]
-
-  val fileMatchRegex = ".*"
-  val fileTimestampExtractRegex = ".*(yyyyMMdd_HHmmss).*"
-}
-
-sealed trait Format {
-  val sparkFormat: String
-  val fileExtension: String
-}
-object Formats {
-  case object AVRO extends Format {override val sparkFormat = "avro"; override val fileExtension: String = ".avro"}
-  case object BINARY extends Format {override val sparkFormat = "binaryFile"; override val fileExtension: String = ".*"}
-  case object CSV extends Format {override val sparkFormat = "csv"; override val fileExtension: String = ".csv"}
-  case object DELTA extends Format {override val sparkFormat = "delta"; override val fileExtension: String = ".parquet"}
-  case object KAFKA extends Format {override val sparkFormat = "kafka"; override val fileExtension: String = ".*"}
-  case object JSON extends Format {override val sparkFormat = "json"; override val fileExtension: String = ".json"}
-  case object JSON_LINES extends Format {override val sparkFormat = "json"; override val fileExtension: String = ".jsonl"}
 }
 
 trait DatalakeFile {
