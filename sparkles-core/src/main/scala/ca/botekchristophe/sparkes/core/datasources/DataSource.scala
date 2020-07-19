@@ -6,6 +6,8 @@
 
 package ca.botekchristophe.sparkes.core.datasources
 
+import org.apache.spark.sql.types.StructType
+
 /**
  * A DataSource is the base definition of any Data sources, this could be a stream, a file, a set of files
  * or even a table in a DBMS.
@@ -27,4 +29,11 @@ trait DataSource {
    * The format of the DataSource, see [[Format]] for examples.
    */
   val format: Format
+
+  /**
+   * In general, you want to enforce the schema on your tables in Gold zone,
+   * But there can be a case for loose schema in bronze and silver zones and thus keeping
+   * the schema of a DataSource optional
+   */
+  val schema: Option[StructType] = None
 }
