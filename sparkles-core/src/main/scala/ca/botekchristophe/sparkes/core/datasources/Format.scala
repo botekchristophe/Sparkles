@@ -4,7 +4,7 @@
  * information regarding copyright ownership.
  */
 
-package ca.botekchristophe.sparkes.core.datasource
+package ca.botekchristophe.sparkes.core.datasources
 
 /**
  * Sealed trait expressing the definition of a [[ca.botekchristophe.sparkes.core.DataSource]] format.

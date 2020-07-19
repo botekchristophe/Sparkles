@@ -6,6 +6,7 @@
 
 package ca.botekchristophe.sparkes.core
 
+import ca.botekchristophe.sparkes.core.tables.DeltaScd2Table
 import cats.implicits._
 import org.apache.spark.sql.DataFrame
 

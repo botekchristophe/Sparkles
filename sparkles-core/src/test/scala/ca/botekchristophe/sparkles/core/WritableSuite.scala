@@ -6,8 +6,8 @@
 
 package ca.botekchristophe.sparkles.core
 
-import ca.botekchristophe.sparkes.core.DeltaScd2Table
 import ca.botekchristophe.sparkes.core.Writable._
+import ca.botekchristophe.sparkes.core.tables.DeltaScd2Table
 import org.apache.spark.sql.{DataFrame, SparkSession}
 import org.scalatest.flatspec.AnyFlatSpec
 import org.scalatest.matchers
