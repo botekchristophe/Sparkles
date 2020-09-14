@@ -8,5 +8,5 @@ package ca.botekchristophe.sparkes.core.writers
 import ca.botekchristophe.sparkes.core.datasources.DataTable
 
 trait InsertMode {self: DataTable =>
-
+  val eventDateColumnName: String = "event_dte"
 }

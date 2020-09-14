@@ -24,6 +24,6 @@ class ReadableSuite extends AnyFlatSpec with matchers.should.Matchers {
 
 
   "Readable" should "read delta scd2 table" in {
-    spark.readData(DeltaScd2Table("", "", Set())).isLeft shouldBe true
+    spark.readData(DeltaScd2Table("path/relative/", "source", "name", "database")).isLeft shouldBe true
   }
 }

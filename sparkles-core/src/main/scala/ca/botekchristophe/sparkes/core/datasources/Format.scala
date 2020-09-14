@@ -7,7 +7,7 @@
 package ca.botekchristophe.sparkes.core.datasources
 
 /**
- * Sealed trait expressing the definition of a [[ca.botekchristophe.sparkes.core.DataSource]] format.
+ * Sealed trait expressing the definition of a [[ca.botekchristophe.sparkes.core.datasources.DataSource]] format.
  * Depending on the context it could be the format of a file, a table or a stream like source of data like Kafka.
  * In general, it represents any format that can be read by Spark and loaded as a [[org.apache.spark.sql.Dataset]].
  */

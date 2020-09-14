@@ -37,7 +37,7 @@ case class DeltaUpsertTable(override val relativePath: String,
   override val format: Format = Formats.DELTA
 }
 
-object DeltaScd2Table {
+object DeltaUpsertTable {
 
   def apply(relativePath: String,
             sourceName: String,
@@ -45,15 +45,15 @@ object DeltaScd2Table {
             name: String,
             database: String,
             schema: Option[StructType],
-            dependencies: Set[DataSource]): DeltaInsertTable =
-    new DeltaInsertTable(relativePath, sourceName, Some(domainName), name, database, schema, dependencies)
+            dependencies: Set[DataSource]): DeltaUpsertTable =
+    new DeltaUpsertTable(relativePath, sourceName, Some(domainName), name, database, schema, dependencies)
 
   def apply(relativePath: String,
             sourceName: String,
             name: String,
             database: String,
             schema: Option[StructType],
-            dependencies: Set[DataSource]): DeltaInsertTable =
-    new DeltaInsertTable(relativePath, sourceName, None, name, database, schema, dependencies)
+            dependencies: Set[DataSource]): DeltaUpsertTable =
+    new DeltaUpsertTable(relativePath, sourceName, None, name, database, schema, dependencies)
 }
 

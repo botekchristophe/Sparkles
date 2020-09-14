@@ -9,6 +9,6 @@ import ca.botekchristophe.sparkes.core.datasources.DataTable
 
 trait Scd1Mode {self: DataTable =>
   val oidColumnName: String = s"${self.name}_oid"
-  val createdOnColumnName: String = "CreatedOnDts"
-  val updatedOnColumnName: String = "UpdatedOnDts"
+  val createdOnColumnName: String = "created_on_dts"
+  val updatedOnColumnName: String = "updated_on_dts"
 }

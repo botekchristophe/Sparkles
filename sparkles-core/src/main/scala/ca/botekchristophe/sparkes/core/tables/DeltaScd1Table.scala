@@ -45,15 +45,15 @@ object DeltaScd1Table {
             name: String,
             database: String,
             schema: Option[StructType],
-            dependencies: Set[DataSource]): DeltaInsertTable =
-    new DeltaInsertTable(relativePath, sourceName, Some(domainName), name, database, schema, dependencies)
+            dependencies: Set[DataSource]): DeltaScd1Table =
+    new DeltaScd1Table(relativePath, sourceName, Some(domainName), name, database, schema, dependencies)
 
   def apply(relativePath: String,
             sourceName: String,
             name: String,
             database: String,
             schema: Option[StructType],
-            dependencies: Set[DataSource]): DeltaInsertTable =
-    new DeltaInsertTable(relativePath, sourceName, None, name, database, schema, dependencies)
+            dependencies: Set[DataSource]): DeltaScd1Table =
+    new DeltaScd1Table(relativePath, sourceName, None, name, database, schema, dependencies)
 }
 
