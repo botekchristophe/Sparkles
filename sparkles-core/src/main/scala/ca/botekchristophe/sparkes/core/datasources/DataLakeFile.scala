@@ -8,7 +8,7 @@ package ca.botekchristophe.sparkes.core.datasources
 
 /**
  * A DataLakeFile represents a file or many files containing structured or unstructured data.
- * When the files can only be represented as a table, use [[ca.botekchristophe.sparkes.core.DataTable]] instead.
+ * When the files can only be represented as a table, use [[ca.botekchristophe.sparkes.core.datasources.DataSource]] instead.
  * In certain cases, like with Delta Lake table we might want to mix DataTable and DataLakeFile traits together.
  * Usually, this trait is used for raw file directly deposited on a Data Lake.
  */
@@ -65,7 +65,7 @@ trait DataLakeFile extends DataSource {
    * Partitioning pattern for the data file.
    * Supports all formats in  [[java.text.SimpleDateFormat]]
    */
-  val partitionPattern: String =
+  lazy val partitionPattern: String =
     domainName.fold(
       s"$sourceName/yyyy/MM/dd/${name}_yyyyMMdd_HHmmss${format.fileExtension}"
     )(domain =>
@@ -82,7 +82,7 @@ trait DataLakeFile extends DataSource {
    * Regex matching all the files from the same data source.
    * This can be used to filter the files when doing a listFile() inside a folder.
    */
-  val fileMatchRegex: String =
+  lazy val fileMatchRegex: String =
     domainName.fold(
       s"$sourceName/\\d{4}/\\d{2}/\\d{2}/${name}_\\d{8}_\\d{6}${format.fileExtension}"
     )(domain =>
@@ -92,7 +92,7 @@ trait DataLakeFile extends DataSource {
   /**
    * Location of the file(s). This string can be passed to Spark in order to read the file(s)
    */
-  val location: String =
+  lazy val location: String =
     domainName.fold(
       s"$sourceName/*/*/*/${name}_*_*${format.fileExtension}"
     )(domain =>
@@ -102,5 +102,5 @@ trait DataLakeFile extends DataSource {
   /**
    * Regex extracting the file timestamp.
    */
-  val fileTimestampExtractRegex: String = s"${name}_(yyyyMMdd_HHmmss)${format.fileExtension}"
+  lazy val fileTimestampExtractRegex: String = s"${name}_(yyyyMMdd_HHmmss)${format.fileExtension}"
 }

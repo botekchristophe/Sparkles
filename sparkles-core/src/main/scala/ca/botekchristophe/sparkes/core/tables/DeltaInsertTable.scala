@@ -6,7 +6,7 @@
 
 package ca.botekchristophe.sparkes.core.tables
 
-import ca.botekchristophe.sparkes.core.datasources.{DataLakeFile, DataSource, DataTable, Format, Formats}
+import ca.botekchristophe.sparkes.core.datasources._
 import ca.botekchristophe.sparkes.core.writers.InsertMode
 import org.apache.spark.sql.types.StructType
 
