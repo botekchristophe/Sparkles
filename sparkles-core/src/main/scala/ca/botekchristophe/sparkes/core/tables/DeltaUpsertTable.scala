@@ -18,7 +18,7 @@ case class DeltaUpsertTable(override val relativePath: String,
                             override val schema: Option[StructType],
                             override val dependencies: Set[DataSource])
 
-  extends DataTable with UpsertMode with DataLakeFile {
+  extends FactTable with UpsertMode with DataLakeFile {
 
   /**
    * For some files like JSON or CSV, we might want to set specific readOptions to Spark.

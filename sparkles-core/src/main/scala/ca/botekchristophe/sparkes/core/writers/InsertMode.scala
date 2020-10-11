@@ -5,8 +5,8 @@
  */
 package ca.botekchristophe.sparkes.core.writers
 
-import ca.botekchristophe.sparkes.core.datasources.DataTable
+import ca.botekchristophe.sparkes.core.datasources.FactTable
 
-trait InsertMode {self: DataTable =>
-  val eventDateColumnName: String = "event_dte"
+trait InsertMode {self: FactTable =>
+
 }

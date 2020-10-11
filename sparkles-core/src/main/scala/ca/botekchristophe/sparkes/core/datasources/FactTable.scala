@@ -3,10 +3,8 @@
  * See the LICENCE.txt file distributed with this work for additional
  * information regarding copyright ownership.
  */
-package ca.botekchristophe.sparkes.core.writers
+package ca.botekchristophe.sparkes.core.datasources
 
-import ca.botekchristophe.sparkes.core.datasources.FactTable
-
-trait UpsertMode {self: FactTable =>
-
+trait FactTable extends DataTable {
+  val eventDateColumnName: String = "event_dte"
 }

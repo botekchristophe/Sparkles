@@ -36,4 +36,21 @@ trait DataSource {
    * the schema of a DataSource optional
    */
   val schema: Option[StructType] = None
+
+  /**
+   * For some files like JSON or CSV, we might want to set specific readOptions to Spark.
+   * Can be empty
+   */
+  val readOptions: Map[String, String]
+
+  /**
+   * We might want to set specific writeOptions to Spark when writing raw files.
+   * Can be empty
+   */
+  val writeOptions: Map[String, String]
+
+  /**
+   * Location of the source. This string can be passed to Spark in order to read the source
+   */
+  def location: String
 }

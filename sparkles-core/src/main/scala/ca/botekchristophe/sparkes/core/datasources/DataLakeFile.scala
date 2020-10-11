@@ -9,7 +9,7 @@ package ca.botekchristophe.sparkes.core.datasources
 /**
  * A DataLakeFile represents a file or many files containing structured or unstructured data.
  * When the files can only be represented as a table, use [[ca.botekchristophe.sparkes.core.datasources.DataSource]] instead.
- * In certain cases, like with Delta Lake table we might want to mix DataTable and DataLakeFile traits together.
+ * In some cases, like a Delta Lake table, we might want to mix DataTable and DataLakeFile traits together.
  * Usually, this trait is used for raw file directly deposited on a Data Lake.
  */
 trait DataLakeFile extends DataSource {
@@ -38,18 +38,6 @@ trait DataLakeFile extends DataSource {
    * If you do not wish to use a domain, you can leave the value empty
    */
   val domainName: Option[String]
-
-  /**
-   * For some files like JSON or CSV, we might want to set specific readOptions to Spark.
-   * Can be empty
-   */
-  val readOptions: Map[String, String]
-
-  /**
-   * We might want to set specific writeOptions to Spark when writing raw files.
-   * Can be empty
-   */
-  val writeOptions: Map[String, String]
 
   /**
    * Name of the folder to use for new files
@@ -92,7 +80,7 @@ trait DataLakeFile extends DataSource {
   /**
    * Location of the file(s). This string can be passed to Spark in order to read the file(s)
    */
-  lazy val location: String =
+  override def location: String =
     domainName.fold(
       s"$sourceName/*/*/*/${name}_*_*${format.fileExtension}"
     )(domain =>
