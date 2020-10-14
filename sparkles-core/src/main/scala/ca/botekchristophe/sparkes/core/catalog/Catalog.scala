@@ -8,9 +8,13 @@ package ca.botekchristophe.sparkes.core.catalog
 
 import ca.botekchristophe.sparkes.core.datasources.DataSource
 
+/**
+ * A data Catalog can be used to store configurations about data sources.
+ */
 trait Catalog {
 
+  /**
+   * The list of data sources in the catalog
+   */
   val dataSources: Set[DataSource]
-
-  def getImpactedDataSources: DataSource => Set[DataSource]
 }

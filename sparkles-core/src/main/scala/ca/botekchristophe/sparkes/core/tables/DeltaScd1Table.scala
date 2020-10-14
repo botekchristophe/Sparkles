@@ -7,9 +7,11 @@
 package ca.botekchristophe.sparkes.core.tables
 
 import ca.botekchristophe.sparkes.core.datasources._
-import ca.botekchristophe.sparkes.core.writers.Scd1Mode
 import org.apache.spark.sql.types.StructType
 
+/**
+ * An implementation of a slow changing dimension type 1 table with Delta Lake.
+ */
 case class DeltaScd1Table(override val relativePath: String,
                           override val sourceName: String,
                           override val domainName: Option[String],
@@ -18,7 +20,7 @@ case class DeltaScd1Table(override val relativePath: String,
                           override val schema: Option[StructType],
                           override val dependencies: Set[DataSource])
 
-  extends DataTable with Scd1Mode with DataLakeFile {
+  extends Scd1Table with DataLakeFile {
 
   /**
    * For some files like JSON or CSV, we might want to set specific readOptions to Spark.

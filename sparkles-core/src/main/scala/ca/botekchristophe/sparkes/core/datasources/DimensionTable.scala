@@ -6,8 +6,8 @@
 package ca.botekchristophe.sparkes.core.datasources
 
 /**
- * Fact tables usually store events or facts that do not change over time and are tied to a date.
+ * DimensionTable tables usually store informations that changes over time or can be updated.
  */
-trait FactTable extends DataTable {
-  val eventDateColumnName: String = "event_dte"
+trait DimensionTable extends DataTable {
+  val oidColumnName: String = s"${name}_oid"
 }

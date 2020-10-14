@@ -7,11 +7,9 @@ package ca.botekchristophe.sparkes.core.writers
 
 import java.time.LocalDate
 
-import ca.botekchristophe.sparkes.core.datasources.DataTable
+import ca.botekchristophe.sparkes.core.datasources.DimensionTable
 
-trait Scd2Mode {self: DataTable =>
-
-  val oidColumnName: String = s"${self.name}_oid"
+trait Scd2Mode {self: DimensionTable =>
 
   val validFromColumnName: String = "valid_from_dte"
 

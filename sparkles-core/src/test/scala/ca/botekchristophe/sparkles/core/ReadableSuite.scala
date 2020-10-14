@@ -24,8 +24,7 @@ class ReadableSuite extends AnyFlatSpec with matchers.should.Matchers {
   val location: String = getClass.getClassLoader.getResource(".").getPath
 
 
-
-
+  //TODO fix this
   "Readable" should "read delta scd2 table" in {
     LocalFileSystem.list(location).foreach(_.foreach(f => println(f.path)))
     //println(location)

@@ -10,6 +10,9 @@ import ca.botekchristophe.sparkes.core.datasources._
 import ca.botekchristophe.sparkes.core.writers.UpsertMode
 import org.apache.spark.sql.types.StructType
 
+/**
+ * An implementation of a insert or update (upsert) table with delta lake.
+ */
 case class DeltaUpsertTable(override val relativePath: String,
                             override val sourceName: String,
                             override val domainName: Option[String],

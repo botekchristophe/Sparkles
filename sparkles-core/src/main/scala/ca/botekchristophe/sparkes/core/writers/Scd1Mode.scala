@@ -5,10 +5,11 @@
  */
 package ca.botekchristophe.sparkes.core.writers
 
-import ca.botekchristophe.sparkes.core.datasources.DataTable
+import ca.botekchristophe.sparkes.core.datasources.DimensionTable
 
-trait Scd1Mode {self: DataTable =>
-  val oidColumnName: String = s"${self.name}_oid"
+trait Scd1Mode {self: DimensionTable =>
+
   val createdOnColumnName: String = "created_on_dts"
+
   val updatedOnColumnName: String = "updated_on_dts"
 }

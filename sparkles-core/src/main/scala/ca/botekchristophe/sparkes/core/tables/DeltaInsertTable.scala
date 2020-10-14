@@ -10,6 +10,9 @@ import ca.botekchristophe.sparkes.core.datasources._
 import ca.botekchristophe.sparkes.core.writers.InsertMode
 import org.apache.spark.sql.types.StructType
 
+/**
+ * An implementation of an insert only table with Delta Lake.
+ */
 case class DeltaInsertTable(override val relativePath: String,
                             override val sourceName: String,
                             override val domainName: Option[String],
