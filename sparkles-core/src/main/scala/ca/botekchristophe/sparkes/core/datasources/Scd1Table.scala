@@ -11,4 +11,4 @@ import ca.botekchristophe.sparkes.core.writers.Scd1Mode
 /**
  * A trait for Slow changing dimension type 1 tables.
  */
-trait Scd1Table extends DataTable with Scd1Mode
+trait Scd1Table extends DimensionTable with Scd1Mode

@@ -11,4 +11,4 @@ import ca.botekchristophe.sparkes.core.writers.Scd2Mode
 /**
  * A trait for Slow changing dimension type 2 tables.
  */
-trait Scd2Table extends DataTable with Scd2Mode
+trait Scd2Table extends DimensionTable with Scd2Mode
