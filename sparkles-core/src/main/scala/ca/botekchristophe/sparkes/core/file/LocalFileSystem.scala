@@ -6,11 +6,15 @@
 
 package ca.botekchristophe.sparkes.core.file
 
+import java.io
+import java.nio.file.{Files, Path, Paths, StandardCopyOption}
+
+import org.apache.commons.io.FileUtils
 import cats.implicits._
 import org.apache.commons.lang.NotImplementedException
 
 import scala.annotation.tailrec
-import scala.util.Try
+import scala.util.{Failure, Success, Try}
 
 /**
  * Implementation of [[FileSystem]] for local development or testing.
@@ -67,16 +71,27 @@ object LocalFileSystem extends FileSystem {
 
   /**
    * Copy a file to a destination folder.
-   * If the param 'recursive' is set to true, the function must copy all files contained in the subtree
-   * If the param 'recursive' is false and the file is a directory the function must fail.
+   *
    * @param source source file path
    * @param destination destination file path
-   * @param recursive recursive flag
+   * @param overwrite overwrite flag
    * @return returns Unit if the copy was successful
    *         returns an error if the copy failed
    */
-  override def copy(source: String, destination: String, recursive: Boolean): Either[String, Unit] = {
-    throw new NotImplementedException("Method Not implemented")
+  override def copy(source: String, destination: String, overwrite: Boolean): Either[String, Unit] = {
+    //TODO implement overwrite mode vs safe mode
+    Try {
+      val src = new io.File(source)
+      val dst = new io.File(destination)
+      if (src.isDirectory) {
+        FileUtils.copyDirectory(src, dst)
+      } else {
+        FileUtils.copyFile(src, dst)
+      }
+    } match {
+      case Failure(e) => Left(e.getLocalizedMessage)
+      case Success(_) => Right()
+    }
   }
 
   /**
