@@ -7,11 +7,10 @@
 package ca.botekchristophe.sparkes.core.file
 
 import java.io
-import java.nio.file.{Files, Path, Paths, StandardCopyOption}
+import java.io.IOException
 
-import org.apache.commons.io.FileUtils
 import cats.implicits._
-import org.apache.commons.lang.NotImplementedException
+import org.apache.commons.io.FileUtils
 
 import scala.annotation.tailrec
 import scala.util.{Failure, Success, Try}
@@ -54,6 +53,14 @@ object LocalFileSystem extends FileSystem {
       .map(file => File(file.getAbsolutePath, file.getName, file.length(), file.isDirectory))
   }
 
+  /**
+   * List the files in a directory, can be recursive or non recursive.
+   * @param path path of the directory where to start the lookup
+   * @param recursive if true, the lookup will be recursive.
+   * @return the list of all files in the root directory along with the files in the sub directories if parameter
+   *         'recursive' is true.
+   *         Returns an error if anything went wrong during the listing.
+   */
   override def list(path: String, recursive: Boolean = true): Either[String, List[File]] = {
     Try(
       if(recursive) {
@@ -74,15 +81,17 @@ object LocalFileSystem extends FileSystem {
    *
    * @param source source file path
    * @param destination destination file path
-   * @param overwrite overwrite flag
+   * @param overwrite flag
    * @return returns Unit if the copy was successful
    *         returns an error if the copy failed
    */
-  override def copy(source: String, destination: String, overwrite: Boolean): Either[String, Unit] = {
-    //TODO implement overwrite mode vs safe mode
+  override def copy(source: String, destination: String, overwrite: Boolean = false): Either[String, Unit] = {
     Try {
       val src = new io.File(source)
       val dst = new io.File(destination)
+      if (dst.exists() && !overwrite) {
+        throw new IOException(s"Destination non empty. Remove file(s) or use overwrite argument.")
+      }
       if (src.isDirectory) {
         FileUtils.copyDirectory(src, dst)
       } else {
@@ -101,6 +110,11 @@ object LocalFileSystem extends FileSystem {
    *         returns an error if the removal failed
    */
   override def remove(path: String): Either[String, Unit] = {
-    throw new NotImplementedException("Method Not implemented")
+    Try {
+      FileUtils.deleteQuietly(new io.File(path))
+    } match {
+      case Failure(e) => Left(e.getLocalizedMessage)
+      case Success(_) => Right()
+    }
   }
 }

@@ -39,19 +39,18 @@ trait FileSystem {
    *         'recursive' is true.
    *         Returns an error if anything went wrong during the listing.
    */
-  def list(path: String, recursive: Boolean = true): Either[String, List[File]]
+  def list(path: String, recursive: Boolean): Either[String, List[File]]
 
   /**
    * Copy a file to a destination folder.
-   * If the param 'recursive' is set to true, the function must copy all files contained in the subtree
-   * If the param 'recursive' is false and the file is a directory the function must fail.
+   *
    * @param source source file path
    * @param destination destination file path
-   * @param recursive recursive flag
+   * @param overwrite flag
    * @return returns Unit if the copy was successful
    *         returns an error if the copy failed
    */
-  def copy(source: String, destination: String, recursive: Boolean = true): Either[String, Unit]
+  def copy(source: String, destination: String, overwrite: Boolean): Either[String, Unit]
 
   /**
    * Removes file(s)

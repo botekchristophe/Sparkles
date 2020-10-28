@@ -20,7 +20,7 @@ case class DeltaScd2Table(override val relativePath: String,
                           override val schema: Option[StructType],
                           override val dependencies: Set[DataSource])
 
-  extends Scd2Table with DataLakeFile {
+  extends Scd2Table with DataLakeTable {
 
   /**
    * For some files like JSON or CSV, we might want to set specific readOptions to Spark.

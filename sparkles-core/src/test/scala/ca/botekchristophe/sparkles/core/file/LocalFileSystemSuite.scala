@@ -45,18 +45,36 @@ class LocalFileSystemSuite extends AnyFlatSpec with matchers.should.Matchers {
   }
 
   "LocalFileSystem" should "copy files in default storage" in {
-    val result1 = LocalFileSystem.list(LocalFileSystem.defaultRootPath + random + "_2")
+    val source = LocalFileSystem.defaultRootPath + random
+    val destination = LocalFileSystem.defaultRootPath + random + "_copy"
+
+    val result1 = LocalFileSystem.list(destination)
 
     result1.getOrElse(List()).count(_.name.endsWith(".csv")) shouldBe 0
 
-    val source = LocalFileSystem.defaultRootPath + random
-    val destination = LocalFileSystem.defaultRootPath + random + "_2"
-    println(source)
-    println(destination)
-
-    LocalFileSystem.copy(LocalFileSystem.defaultRootPath + random, LocalFileSystem.defaultRootPath + random + "_2", overwrite = true)
-    val result2 = LocalFileSystem.list(LocalFileSystem.defaultRootPath + random + "_2")
+    LocalFileSystem.copy(source, destination)
+    val result2 = LocalFileSystem.list(destination)
 
     result2.getOrElse(List.empty[File]).count(_.name.endsWith(".csv")) shouldBe 1
+
+    //second time should fail
+    LocalFileSystem.copy(source, destination).isLeft shouldBe true
+
+    //third time should overwrite
+    LocalFileSystem.copy(source, destination, overwrite = true).isRight shouldBe true
+  }
+
+  "LocalFileSystem" should "remove files in default storage" in {
+    val source = LocalFileSystem.defaultRootPath + random
+    val destination = LocalFileSystem.defaultRootPath + random + "_delete"
+
+    val result1 = LocalFileSystem.list(destination)
+
+    result1.getOrElse(List()).count(_.name.endsWith(".csv")) shouldBe 0
+
+    LocalFileSystem.copy(source, destination)
+    LocalFileSystem.remove(destination)
+    val result2 = LocalFileSystem.list(destination)
+    result2.getOrElse(List.empty[File]).count(_.name.endsWith(".csv")) shouldBe 0
   }
 }

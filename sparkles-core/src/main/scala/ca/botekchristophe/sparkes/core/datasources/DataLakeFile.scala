@@ -6,6 +6,8 @@
 
 package ca.botekchristophe.sparkes.core.datasources
 
+import ca.botekchristophe.sparkes.core.file.FileSystem
+
 /**
  * A DataLakeFile represents a file or many files containing structured or unstructured data.
  * When the files can only be represented as a table, use [[ca.botekchristophe.sparkes.core.datasources.DataSource]] instead.
@@ -80,7 +82,7 @@ trait DataLakeFile extends DataSource {
   /**
    * Location of the file(s). This string can be passed to Spark in order to read the file(s)
    */
-  override def location: String =
+  override def location(fs: FileSystem): String =
     domainName.fold(
       s"$sourceName/*/*/*/${name}_*_*${format.fileExtension}"
     )(domain =>

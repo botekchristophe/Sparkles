@@ -7,6 +7,7 @@
 package ca.botekchristophe.sparkes.core.tables
 
 import ca.botekchristophe.sparkes.core.datasources._
+import ca.botekchristophe.sparkes.core.file.FileSystem
 import ca.botekchristophe.sparkes.core.writers.UpsertMode
 import org.apache.spark.sql.types.StructType
 
@@ -21,7 +22,7 @@ case class DeltaUpsertTable(override val relativePath: String,
                             override val schema: Option[StructType],
                             override val dependencies: Set[DataSource])
 
-  extends FactTable with UpsertMode with DataLakeFile {
+  extends FactTable with UpsertMode with DataLakeTable {
 
   /**
    * For some files like JSON or CSV, we might want to set specific readOptions to Spark.

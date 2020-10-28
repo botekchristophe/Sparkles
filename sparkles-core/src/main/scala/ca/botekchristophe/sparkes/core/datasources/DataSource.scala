@@ -6,6 +6,7 @@
 
 package ca.botekchristophe.sparkes.core.datasources
 
+import ca.botekchristophe.sparkes.core.file.FileSystem
 import org.apache.spark.sql.types.StructType
 
 /**
@@ -52,5 +53,5 @@ trait DataSource {
   /**
    * Location of the source. This string can be passed to Spark in order to read the source
    */
-  def location: String
+  def location(fs: FileSystem): String
 }

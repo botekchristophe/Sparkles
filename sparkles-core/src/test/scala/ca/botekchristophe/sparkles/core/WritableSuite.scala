@@ -6,7 +6,10 @@
 
 package ca.botekchristophe.sparkles.core
 
+import java.util.UUID
+
 import ca.botekchristophe.sparkes.core.Writable._
+import ca.botekchristophe.sparkes.core.file.{FileSystem, LocalFileSystem}
 import ca.botekchristophe.sparkes.core.tables.DeltaScd2Table
 import org.apache.spark.sql.{DataFrame, SparkSession}
 import org.scalatest.flatspec.AnyFlatSpec
@@ -20,10 +23,14 @@ class WritableSuite extends AnyFlatSpec with matchers.should.Matchers {
 
 
   val df: DataFrame = List(("a", 1)).toDF("col1", "col2")
-  val location: String = getClass.getClassLoader.getResource(".") + "DeltaSourceSuite"
+
+  val fs: FileSystem = LocalFileSystem
 
 
   "Writable" should "write delta scd2 table" in {
-    df.writeData(DeltaScd2Table("path/relative/", "source", "name", "database")).isRight shouldBe true
+
+    val testTable = DeltaScd2Table("path/relative/", UUID.randomUUID().toString, "name", "database")
+
+    df.writeData(testTable, fs = fs).isRight shouldBe true
   }
 }
