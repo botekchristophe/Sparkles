@@ -6,7 +6,7 @@
 
 package ca.botekchristophe.sparkes.core.datasources
 
-import ca.botekchristophe.sparkes.core.writers.Scd2Mode
+import ca.botekchristophe.sparkes.core.io.Scd2Mode
 
 /**
  * A trait for Slow changing dimension type 2 tables.

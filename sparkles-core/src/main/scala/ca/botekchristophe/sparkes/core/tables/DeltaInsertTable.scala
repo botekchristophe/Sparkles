@@ -7,8 +7,7 @@
 package ca.botekchristophe.sparkes.core.tables
 
 import ca.botekchristophe.sparkes.core.datasources._
-import ca.botekchristophe.sparkes.core.file.FileSystem
-import ca.botekchristophe.sparkes.core.writers.InsertMode
+import ca.botekchristophe.sparkes.core.io.InsertMode
 import org.apache.spark.sql.types.StructType
 
 /**

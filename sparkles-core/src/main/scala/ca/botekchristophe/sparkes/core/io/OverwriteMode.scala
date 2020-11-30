@@ -3,10 +3,10 @@
  * See the LICENCE.txt file distributed with this work for additional
  * information regarding copyright ownership.
  */
-package ca.botekchristophe.sparkes.core.writers
+package ca.botekchristophe.sparkes.core.io
 
-import ca.botekchristophe.sparkes.core.datasources.FactTable
+import ca.botekchristophe.sparkes.core.datasources.DataTable
 
-trait UpsertMode {self: FactTable =>
+trait OverwriteMode {self: DataTable =>
 
 }

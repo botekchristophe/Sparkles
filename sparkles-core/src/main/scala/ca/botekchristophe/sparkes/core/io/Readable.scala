@@ -4,7 +4,7 @@
  * information regarding copyright ownership.
  */
 
-package ca.botekchristophe.sparkes.core
+package ca.botekchristophe.sparkes.core.io
 
 import java.sql.{Date, Timestamp}
 import java.time.LocalDateTime
