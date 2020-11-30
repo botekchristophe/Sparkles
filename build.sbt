@@ -6,12 +6,12 @@
 
 organization in ThisBuild := "ca.botekchristophe"
 
-scalaVersion in ThisBuild := "2.12.10"
+scalaVersion in ThisBuild := "2.12.11"
 
 scalacOptions ++= Seq("-deprecation")
 scalacOptions += "-Ypartial-unification"
 
-val sparkVersion = "3.0.0"
+val sparkVersion = "3.0.1"
 val deltaCoreVersion = "0.7.0"
 val testNgVersion = "6.14.3"
 val typesafeVersion = "1.2.1"

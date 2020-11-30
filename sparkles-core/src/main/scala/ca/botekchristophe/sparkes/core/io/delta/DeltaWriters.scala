@@ -10,6 +10,7 @@ import ca.botekchristophe.sparkes.core.file.FileSystem
 import ca.botekchristophe.sparkes.core.tables.{DeltaScd1Table, DeltaScd2Table, DeltaUpsertTable}
 import cats.implicits._
 import io.delta.tables.DeltaTable
+import org.apache.spark.sql.functions._
 import org.apache.spark.sql.{DataFrame, SaveMode, SparkSession}
 
 import scala.util.Try
@@ -25,6 +26,11 @@ object DeltaWriters {
    * @return
    */
   def scd1(targetTable: DeltaScd1Table, updates: DataFrame, fs: FileSystem): Either[String, DataFrame] = {
+    require(updates.columns.exists(_.equals(targetTable.buidColumnName)), s"Scd1 requires column [${targetTable.buidColumnName}]")
+    require(updates.columns.exists(_.equals(targetTable.oidColumnName)), s"Scd1 requires column [${targetTable.oidColumnName}]")
+    require(updates.columns.exists(_.equals(targetTable.createdOnColumnName)), s"Scd1 requires column [${targetTable.createdOnColumnName}]")
+    require(updates.columns.exists(_.equals(targetTable.updatedOnColumnName)), s"Scd1 requires column [${targetTable.updatedOnColumnName}]")
+
     Try(DeltaTable.forPath(SparkSession.active, targetTable.location(fs)))
       .toEither
       .fold({_ =>
@@ -32,10 +38,22 @@ object DeltaWriters {
       },{
         table =>
           if (!table.toDF.isEmpty) {
+            val existingBuidOidPairs =
+              table
+                .toDF
+                .select(col(targetTable.buidColumnName), col(targetTable.oidColumnName) as s"old_${targetTable.oidColumnName}")
+
+            //Keep only the updates for which the rows was changed, ie. has a different oid
+            val stagedUpdates =
+              updates
+                .join(existingBuidOidPairs, Seq(targetTable.buidColumnName))
+                .filter(col(s"old_${targetTable.oidColumnName}") =!= col(targetTable.oidColumnName))
+
+            //Merge the stagedUpdates to the existing table
             table
               .as("events")
               .merge(
-                updates.as("updates"),
+                stagedUpdates.as("updates"),
                 s"events.${targetTable.buidColumnName} = updates.${targetTable.buidColumnName}")
               .whenMatched
               .updateExpr(updates.columns.filterNot(_.equals(targetTable.createdOnColumnName)).map(c => c -> s"updates.$c").toMap)

@@ -17,10 +17,10 @@ based on dependencies
 - Improve unit testing coverage
 
 ```commandline
-[info] Statement coverage.: 54.15%
+[info] Statement coverage.: 57.58%
 [info] Branch coverage....: 60.00%
 [info] Coverage reports completed
-[error] Coverage is below minimum [54.15% < 90.0%]
-[info] All done. Coverage was [54.15%]
-[success] Total time: 6 s, completed 29-Nov-2020 8:21:54 PM
+[error] Coverage is below minimum [57.58% < 90.0%]
+[info] All done. Coverage was [57.58%]
+[success] Total time: 6 s, completed 30-Nov-2020 6:52:50 AM
 ```
