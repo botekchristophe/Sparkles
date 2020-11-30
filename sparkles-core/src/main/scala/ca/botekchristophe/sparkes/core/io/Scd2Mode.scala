@@ -16,4 +16,6 @@ trait Scd2Mode {self: DimensionTable =>
   val validToColumnName: String = "valid_to_dte"
 
   val infiniteValue: Any = LocalDate.of(9999, 12, 31)
+
+  val isCurrentColumnName: String = "is_current_flag"
 }

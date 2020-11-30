@@ -22,6 +22,16 @@ class WritableSuite extends AnyFlatSpec with matchers.should.Matchers {
   spark.sparkContext.setLogLevel("ERROR")
   import spark.implicits._
 
+  val initialLoadScd2: DataFrame = List(
+    ("a", "a", 1, 999, true),
+    ("b", "b", 1, 999, true)
+  ).toDF("table_buid", "table_oid", "valid_from_dte", "valid_to_dte", "is_current_flag")
+
+  val updateLoadScd2: DataFrame = List(
+    ("a", "aa", 2, 999, true),
+    ("b", "b" , 2, 999, true)
+  ).toDF("table_buid", "table_oid", "valid_from_dte", "valid_to_dte", "is_current_flag")
+
 
   val initialLoad: DataFrame = List(
     ("a", "a", 1, 1),
@@ -40,8 +50,10 @@ class WritableSuite extends AnyFlatSpec with matchers.should.Matchers {
 
     val testTable = DeltaScd2Table("path/relative/", UUID.randomUUID().toString, "table", "database")
 
-    initialLoad.writeData(testTable, fs = fs).isRight shouldBe true
-    updateLoad.writeData(testTable, fs = fs).isRight shouldBe true
+    initialLoadScd2.writeData(testTable, fs = fs).isRight shouldBe true
+    spark.readData(testTable, fs = fs).right.get.show(false)
+    updateLoadScd2.writeData(testTable, fs = fs).isRight shouldBe true
+    spark.readData(testTable, fs = fs).right.get.show(false)
   }
 
   "Writable" should "write delta scd1 table" in {

@@ -48,6 +48,7 @@ object DeltaWriters {
               updates
                 .join(existingBuidOidPairs, Seq(targetTable.buidColumnName))
                 .filter(col(s"old_${targetTable.oidColumnName}") =!= col(targetTable.oidColumnName))
+                .drop(s"old_${targetTable.oidColumnName}")
 
             //Merge the stagedUpdates to the existing table
             table
@@ -81,22 +82,21 @@ object DeltaWriters {
       .toEither
       .fold({_ =>
         updates.write.format("delta").mode("overwrite").save(targetTable.location(fs))
-      },{
-        table =>
-          if (!table.toDF.isEmpty) {
-            table
-              .as("events")
-              .merge(
-                updates.as("updates"),
-                s"events.${targetTable.buidColumnName} = updates.${targetTable.buidColumnName}")
-              .whenMatched
-              .updateAll()
-              .whenNotMatched
-              .insertAll()
-              .execute()
-          } else {
-            updates.write.format("delta").mode("overwrite").save(targetTable.location(fs))
-          }
+      },{ table =>
+        if (!table.toDF.isEmpty) {
+          table
+            .as("events")
+            .merge(
+              updates.as("updates"),
+              s"events.${targetTable.buidColumnName} = updates.${targetTable.buidColumnName}")
+            .whenMatched
+            .updateAll()
+            .whenNotMatched
+            .insertAll()
+            .execute()
+        } else {
+          updates.write.format("delta").mode("overwrite").save(targetTable.location(fs))
+        }
       })
     Right(DeltaTable.forPath(SparkSession.active, targetTable.location(fs)).toDF)
   }
@@ -109,8 +109,45 @@ object DeltaWriters {
    * @return
    */
   def scd2(targetTable: DeltaScd2Table, updates: DataFrame, fs: FileSystem): Either[String, DataFrame] = {
-    Try(updates.write.format(targetTable.format.sparkFormat).mode(SaveMode.Overwrite).save(targetTable.location(fs)))
-      .toEither.map(_ => updates)
-      .leftMap(_.getMessage)
+    Try(DeltaTable.forPath(SparkSession.active, targetTable.location(fs)))
+      .toEither
+      .fold({_=>
+        updates.write.format("delta").mode("overwrite").save(targetTable.location(fs))
+      },{ table =>
+        val buid = targetTable.buidColumnName
+        val oid = targetTable.oidColumnName
+        val isCurrent = targetTable.isCurrentColumnName
+        val validFrom = targetTable.validFromColumnName
+        val validTo = targetTable.validFromColumnName
+        val targetDF =
+          table
+            .toDF
+            .select(col(buid), col(oid) as s"old_$oid")
+            .where(isCurrent)
+
+        val stagedUpdates =
+          updates
+            .join(targetDF, Seq(buid))
+            .where(col(oid) =!= col(s"old_$oid"))
+            .drop(s"old_$oid")
+
+        //TODO - add current record when updating the old one
+        table
+          .as("existing")
+          .merge(
+            stagedUpdates.as("updates"), s"existing.$buid = updates.$buid")
+          .whenMatched(s"existing.$isCurrent = true AND existing.$oid <> updates.$oid")
+          .updateExpr(Map(isCurrent -> "false", validTo -> s"updates.$validFrom"))
+          .whenNotMatched()
+          .insertExpr(
+            updates
+              .drop(isCurrent, validTo)
+              .columns
+              .map(c => c -> s"updates.$c").toMap
+              ++
+              Map(isCurrent -> "true", validTo -> s"${targetTable.infiniteValue}")
+          ).execute()
+      })
+    Right(DeltaTable.forPath(SparkSession.active, targetTable.location(fs)).toDF)
   }
 }
