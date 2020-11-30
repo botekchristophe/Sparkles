@@ -7,7 +7,6 @@
 package ca.botekchristophe.sparkes.core.tables
 
 import ca.botekchristophe.sparkes.core.datasources._
-import ca.botekchristophe.sparkes.core.file.FileSystem
 import org.apache.spark.sql.types.StructType
 
 /**
@@ -58,5 +57,11 @@ object DeltaScd1Table {
             schema: Option[StructType],
             dependencies: Set[DataSource]): DeltaScd1Table =
     new DeltaScd1Table(relativePath, sourceName, None, name, database, schema, dependencies)
+
+  def apply(relativePath: String,
+            sourceName: String,
+            name: String,
+            database: String): DeltaScd1Table =
+    new DeltaScd1Table(relativePath, sourceName, None, name, database, None, Set())
 }
 

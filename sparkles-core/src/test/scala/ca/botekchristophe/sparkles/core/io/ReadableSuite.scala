@@ -4,9 +4,9 @@
  * information regarding copyright ownership.
  */
 
-package ca.botekchristophe.sparkles.core
+package ca.botekchristophe.sparkles.core.io
 
-import ca.botekchristophe.sparkes.core.Readable._
+import ca.botekchristophe.sparkes.core.io.Readable._
 import ca.botekchristophe.sparkes.core.file.{FileSystem, LocalFileSystem}
 import ca.botekchristophe.sparkes.core.tables.DeltaScd2Table
 import org.apache.spark.sql.{DataFrame, SparkSession}

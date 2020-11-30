@@ -6,7 +6,7 @@
 
 package ca.botekchristophe.sparkes.core.datasources
 
-import ca.botekchristophe.sparkes.core.writers.Scd1Mode
+import ca.botekchristophe.sparkes.core.io.Scd1Mode
 
 /**
  * A trait for Slow changing dimension type 1 tables.
