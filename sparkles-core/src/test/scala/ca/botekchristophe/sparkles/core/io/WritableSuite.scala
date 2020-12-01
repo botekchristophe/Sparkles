@@ -6,6 +6,8 @@
 
 package ca.botekchristophe.sparkles.core.io
 
+import java.sql.{Date, Timestamp}
+import java.time.{LocalDate, LocalDateTime}
 import java.util.UUID
 
 import ca.botekchristophe.sparkes.core.file.{FileSystem, LocalFileSystem}
@@ -22,25 +24,17 @@ class WritableSuite extends AnyFlatSpec with matchers.should.Matchers {
   spark.sparkContext.setLogLevel("ERROR")
   import spark.implicits._
 
-  val initialLoadScd2: DataFrame = List(
-    ("a", "a", 1, 999, true),
-    ("b", "b", 1, 999, true)
-  ).toDF("table_buid", "table_oid", "valid_from_dte", "valid_to_dte", "is_current_flag")
-
-  val updateLoadScd2: DataFrame = List(
-    ("a", "aa", 2, 999, true),
-    ("b", "b" , 2, 999, true)
-  ).toDF("table_buid", "table_oid", "valid_from_dte", "valid_to_dte", "is_current_flag")
-
+  val day1 = Timestamp.valueOf(LocalDateTime.of(1900, 1, 1, 0, 0 ,0))
+  val day2 = Timestamp.valueOf(LocalDateTime.of(1900, 1, 2, 0, 0 ,0))
 
   val initialLoad: DataFrame = List(
-    ("a", "a", 1, 1),
-    ("b", "b", 1, 1)
+    ("a", "a", day1, day1),
+    ("b", "b", day1, day1)
   ).toDF("table_buid", "table_oid", "created_on_dts", "updated_on_dts")
 
   val updateLoad: DataFrame = List(
-    ("a", "aa", 2, 2),
-    ("b", "b" , 2, 2)
+    ("a", "aa", day2, day2),
+    ("b", "b" , day2, day2)
   ).toDF("table_buid", "table_oid", "created_on_dts", "updated_on_dts")
 
   val fs: FileSystem = LocalFileSystem
@@ -50,9 +44,9 @@ class WritableSuite extends AnyFlatSpec with matchers.should.Matchers {
 
     val testTable = DeltaScd2Table("path/relative/", UUID.randomUUID().toString, "table", "database")
 
-    initialLoadScd2.writeData(testTable, fs = fs).isRight shouldBe true
+    initialLoad.writeData(testTable, fs = fs).isRight shouldBe true
     spark.readData(testTable, fs = fs).right.get.show(false)
-    updateLoadScd2.writeData(testTable, fs = fs).isRight shouldBe true
+    updateLoad.writeData(testTable, fs = fs).isRight shouldBe true
     spark.readData(testTable, fs = fs).right.get.show(false)
   }
 
@@ -62,22 +56,23 @@ class WritableSuite extends AnyFlatSpec with matchers.should.Matchers {
 
     initialLoad.writeData(testTable, fs = fs).isRight shouldBe true
     val resultInitialLoad = spark.readData(testTable, fs = fs).right.get
+    resultInitialLoad.show(false)
     resultInitialLoad
-      .where($"table_buid".isin("a") and $"created_on_dts".isin(1) and $"updated_on_dts".isin(1))
+      .where($"table_buid".isin("a") and $"created_on_dts".isin(day1) and $"updated_on_dts".isin(day1))
       .count() shouldBe 1L
 
     resultInitialLoad
-      .where($"table_buid".isin("b") and $"created_on_dts".isin(1) and $"updated_on_dts".isin(1))
+      .where($"table_buid".isin("b") and $"created_on_dts".isin(day1) and $"updated_on_dts".isin(day1))
       .count() shouldBe 1L
 
     updateLoad.writeData(testTable, fs = fs).isRight shouldBe true
     val resultSecondLoad = spark.readData(testTable, fs = fs).right.get
     resultSecondLoad
-      .where($"table_buid".isin("a") and $"created_on_dts".isin(1) and $"updated_on_dts".isin(2))
+      .where($"table_buid".isin("a") and $"created_on_dts".isin(day1) and $"updated_on_dts".isin(day2))
       .count() shouldBe 1L
 
     resultSecondLoad
-      .where($"table_buid".isin("b") and $"created_on_dts".isin(1) and $"updated_on_dts".isin(1))
+      .where($"table_buid".isin("b") and $"created_on_dts".isin(day1) and $"updated_on_dts".isin(day1))
       .count() shouldBe 1L
   }
 
@@ -88,21 +83,21 @@ class WritableSuite extends AnyFlatSpec with matchers.should.Matchers {
     initialLoad.writeData(testTable, fs = fs).isRight shouldBe true
     val resultInitialLoad = spark.readData(testTable, fs = fs).right.get
     resultInitialLoad
-      .where($"table_buid".isin("a") and $"created_on_dts".isin(1) and $"updated_on_dts".isin(1))
+      .where($"table_buid".isin("a") and $"created_on_dts".isin(day1) and $"updated_on_dts".isin(day1))
       .count() shouldBe 1L
 
     resultInitialLoad
-      .where($"table_buid".isin("b") and $"created_on_dts".isin(1) and $"updated_on_dts".isin(1))
+      .where($"table_buid".isin("b") and $"created_on_dts".isin(day1) and $"updated_on_dts".isin(day1))
       .count() shouldBe 1L
 
     updateLoad.writeData(testTable, fs = fs).isRight shouldBe true
     val resultSecondLoad = spark.readData(testTable, fs = fs).right.get
     resultSecondLoad
-      .where($"table_buid".isin("a") and $"created_on_dts".isin(2) and $"updated_on_dts".isin(2))
+      .where($"table_buid".isin("a") and $"created_on_dts".isin(day2) and $"updated_on_dts".isin(day2))
       .count() shouldBe 1L
 
     resultSecondLoad
-      .where($"table_buid".isin("b") and $"created_on_dts".isin(2) and $"updated_on_dts".isin(2))
+      .where($"table_buid".isin("b") and $"created_on_dts".isin(day2) and $"updated_on_dts".isin(day2))
       .count() shouldBe 1L
   }
 }
