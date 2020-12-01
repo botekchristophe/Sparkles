@@ -58,5 +58,11 @@ object DeltaInsertTable {
             schema: Option[StructType],
             dependencies: Set[DataSource]): DeltaInsertTable =
     new DeltaInsertTable(relativePath, sourceName, None, name, database, schema, dependencies)
+
+  def apply(relativePath: String,
+            sourceName: String,
+            name: String,
+            database: String): DeltaInsertTable =
+    new DeltaInsertTable(relativePath, sourceName, None, name, database, None, Set())
 }
 

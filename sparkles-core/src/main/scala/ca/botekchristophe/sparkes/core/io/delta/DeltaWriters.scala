@@ -10,10 +10,10 @@ import java.sql.{Date, Timestamp}
 import java.time.{LocalDate, LocalDateTime}
 
 import ca.botekchristophe.sparkes.core.file.FileSystem
-import ca.botekchristophe.sparkes.core.tables.{DeltaScd1Table, DeltaScd2Table, DeltaUpsertTable}
+import ca.botekchristophe.sparkes.core.tables.{DeltaInsertTable, DeltaScd1Table, DeltaScd2Table, DeltaUpsertTable}
 import io.delta.tables.DeltaTable
 import org.apache.spark.sql.functions._
-import org.apache.spark.sql.{Column, DataFrame, SparkSession}
+import org.apache.spark.sql.{Column, DataFrame, SaveMode, SparkSession}
 
 import scala.util.Try
 
@@ -31,12 +31,28 @@ object DeltaWriters {
   }
 
   /**
+   * Insert only
+   *
+   * @param updates the data coming as an update
+   * @param targetTable the configuration of the target table
+   * @param fs an instance of [[FileSystem]]
+   * @return the entire data in the target table
+   */
+  def insert(targetTable: DeltaInsertTable, updates: DataFrame, fs: FileSystem): Either[String, DataFrame] = {
+    Try {
+      updates.write.format("delta").mode(SaveMode.Append).save(targetTable.location(fs))
+    }.fold({error => Left(error.getMessage)}, { _ =>
+      Right(DeltaTable.forPath(SparkSession.active, targetTable.location(fs)).toDF)
+    })
+  }
+
+  /**
    * Slow Changing Dimension type 1, implemented with delta.io api
    *
    * @param updates the data coming as an update
    * @param targetTable the configuration of the target table
    * @param fs an instance of [[FileSystem]]
-   * @return
+   * @return the entire data in the target table
    */
   def scd1(targetTable: DeltaScd1Table, updates: DataFrame, fs: FileSystem): Either[String, DataFrame] = {
     val buid = targetTable.buidColumnName
@@ -93,7 +109,7 @@ object DeltaWriters {
    * @param updates the data coming as an update
    * @param targetTable the configuration of the target table
    * @param fs an instance of [[FileSystem]]
-   * @return
+   * @return the entire data in the target table
    */
   def upsert(targetTable: DeltaUpsertTable, updates: DataFrame, fs: FileSystem): Either[String, DataFrame] = {
     val buid = targetTable.buidColumnName
@@ -129,7 +145,7 @@ object DeltaWriters {
    * @param updates the data coming as an update
    * @param targetTable the configuration of the target table
    * @param fs an instance of [[FileSystem]]
-   * @return
+   * @return the entire data in the target table
    */
   def scd2(targetTable: DeltaScd2Table, updates: DataFrame, fs: FileSystem): Either[String, DataFrame] = {
     val uid = targetTable.uidColumnName

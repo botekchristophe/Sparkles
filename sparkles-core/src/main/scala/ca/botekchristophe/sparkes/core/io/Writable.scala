@@ -51,7 +51,7 @@ object Writable {
   implicit val deltaTableInsertCanWrite: Writable[DeltaInsertTable] =
     new Writable[DeltaInsertTable] {
       override def writeData(a: DeltaInsertTable, data: DataFrame, fs: FileSystem): Either[String, DataFrame] = {
-        genericWriteSource(a, data, fs)
+        DeltaWriters.insert(a, data, fs)
       }
     }
 

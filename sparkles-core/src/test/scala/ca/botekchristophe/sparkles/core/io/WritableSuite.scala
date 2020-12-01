@@ -13,7 +13,7 @@ import java.util.UUID
 import ca.botekchristophe.sparkes.core.file.{FileSystem, LocalFileSystem}
 import ca.botekchristophe.sparkes.core.io.Readable._
 import ca.botekchristophe.sparkes.core.io.Writable._
-import ca.botekchristophe.sparkes.core.tables.{DeltaScd1Table, DeltaScd2Table, DeltaUpsertTable}
+import ca.botekchristophe.sparkes.core.tables.{DeltaInsertTable, DeltaScd1Table, DeltaScd2Table, DeltaUpsertTable}
 import org.apache.spark.sql.{DataFrame, SparkSession}
 import org.scalatest.flatspec.AnyFlatSpec
 import org.scalatest.matchers
@@ -99,5 +99,17 @@ class WritableSuite extends AnyFlatSpec with matchers.should.Matchers {
     resultSecondLoad
       .where($"table_buid".isin("b") and $"created_on_dts".isin(day2) and $"updated_on_dts".isin(day2))
       .count() shouldBe 1L
+  }
+
+  "Writable" should "write delta insert table" in {
+
+    val testTable = DeltaInsertTable("path/relative/", UUID.randomUUID().toString, "table", "database")
+
+    initialLoad.writeData(testTable, fs = fs).isRight shouldBe true
+    val resultInitialLoad = spark.readData(testTable, fs = fs).right.get
+    resultInitialLoad.count() shouldBe 2L
+    updateLoad.writeData(testTable, fs = fs).isRight shouldBe true
+    val resultSecondLoad = spark.readData(testTable, fs = fs).right.get
+    resultSecondLoad.count() shouldBe 4L
   }
 }
