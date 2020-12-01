@@ -9,18 +9,28 @@ package ca.botekchristophe.sparkes.core.io.delta
 import java.sql.{Date, Timestamp}
 import java.time.{LocalDate, LocalDateTime}
 
+import ca.botekchristophe.sparkes.core.datasources.{InsertTable, Scd1Table, Scd2Table, UpsertTable}
 import ca.botekchristophe.sparkes.core.file.FileSystem
-import ca.botekchristophe.sparkes.core.tables.{DeltaInsertTable, DeltaScd1Table, DeltaScd2Table, DeltaUpsertTable}
+import ca.botekchristophe.sparkes.core.io.Writer
 import io.delta.tables.DeltaTable
 import org.apache.spark.sql.functions._
 import org.apache.spark.sql.{Column, DataFrame, SaveMode, SparkSession}
 
 import scala.util.Try
 
-object DeltaWriters {
+object DeltaWriter extends Writer {
 
   implicit class DataFrameOps(df: DataFrame) {
-    def getOrCreateColumn(columnName: String, value: Column): DataFrame = {
+
+    /**
+     * Set a value to a column or create the column if it does not exist yet.
+     * Keeps the old value and the column unchanged if it exists and is not null.
+     *
+     * @param columnName column to set/create
+     * @param value value to set in the column if null or empty
+     * @return
+     */
+    def setOrCreateColumn(columnName: String, value: Column): DataFrame = {
       df
         .columns.find(_.equals(columnName))
         .fold(
@@ -38,7 +48,7 @@ object DeltaWriters {
    * @param fs an instance of [[FileSystem]]
    * @return the entire data in the target table
    */
-  def insert(targetTable: DeltaInsertTable, updates: DataFrame, fs: FileSystem): Either[String, DataFrame] = {
+  override def insert(targetTable: InsertTable, updates: DataFrame, fs: FileSystem): Either[String, DataFrame] = {
     Try {
       updates.write.format("delta").mode(SaveMode.Append).save(targetTable.location(fs))
     }.fold({error => Left(error.getMessage)}, { _ =>
@@ -54,7 +64,7 @@ object DeltaWriters {
    * @param fs an instance of [[FileSystem]]
    * @return the entire data in the target table
    */
-  def scd1(targetTable: DeltaScd1Table, updates: DataFrame, fs: FileSystem): Either[String, DataFrame] = {
+  override def scd1(targetTable: Scd1Table, updates: DataFrame, fs: FileSystem): Either[String, DataFrame] = {
     val buid = targetTable.buidColumnName
     val oid = targetTable.oidColumnName
     val createdOn = targetTable.createdOnColumnName
@@ -63,8 +73,8 @@ object DeltaWriters {
 
     val updatesWithTechnicalFields =
       updates
-        .getOrCreateColumn(createdOn, lit(currentValue))
-        .getOrCreateColumn(updatedOn, lit(currentValue))
+        .setOrCreateColumn(createdOn, lit(currentValue))
+        .setOrCreateColumn(updatedOn, lit(currentValue))
 
     Try {
       require(updates.columns.exists(_.equals(buid)), s"Scd1 requires column [$buid]")
@@ -111,32 +121,34 @@ object DeltaWriters {
    * @param fs an instance of [[FileSystem]]
    * @return the entire data in the target table
    */
-  def upsert(targetTable: DeltaUpsertTable, updates: DataFrame, fs: FileSystem): Either[String, DataFrame] = {
+  override def upsert(targetTable: UpsertTable, updates: DataFrame, fs: FileSystem): Either[String, DataFrame] = {
     val buid = targetTable.buidColumnName
 
-    require(updates.columns.exists(_.equals(buid)), s"upsert requires column [$buid] to be defined")
-
-    Try(DeltaTable.forPath(SparkSession.active, targetTable.location(fs)))
-      .toEither
-      .fold({_ =>
-        updates.write.format("delta").mode("overwrite").save(targetTable.location(fs))
-      },{ table =>
-        if (!table.toDF.isEmpty) {
-          table
-            .as("existing")
-            .merge(
-              updates.as("updates"),
-              s"existing.$buid = updates.$buid")
-            .whenMatched
-            .updateAll()
-            .whenNotMatched
-            .insertAll()
-            .execute()
-        } else {
+    Try {
+      require(updates.columns.exists(_.equals(buid)), s"upsert requires column [$buid] to be defined")
+    }.fold({error => Left(error.getMessage)}, { _ =>
+      Try(DeltaTable.forPath(SparkSession.active, targetTable.location(fs)))
+        .toEither
+        .fold({ _ =>
           updates.write.format("delta").mode("overwrite").save(targetTable.location(fs))
-        }
-      })
-    Right(DeltaTable.forPath(SparkSession.active, targetTable.location(fs)).toDF)
+        }, { table =>
+          if (!table.toDF.isEmpty) {
+            table
+              .as("existing")
+              .merge(
+                updates.as("updates"),
+                s"existing.$buid = updates.$buid")
+              .whenMatched
+              .updateAll()
+              .whenNotMatched
+              .insertAll()
+              .execute()
+          } else {
+            updates.write.format("delta").mode("overwrite").save(targetTable.location(fs))
+          }
+        })
+      Right(DeltaTable.forPath(SparkSession.active, targetTable.location(fs)).toDF)
+    })
   }
 
   /**
@@ -147,7 +159,7 @@ object DeltaWriters {
    * @param fs an instance of [[FileSystem]]
    * @return the entire data in the target table
    */
-  def scd2(targetTable: DeltaScd2Table, updates: DataFrame, fs: FileSystem): Either[String, DataFrame] = {
+  override def scd2(targetTable: Scd2Table, updates: DataFrame, fs: FileSystem): Either[String, DataFrame] = {
     val uid = targetTable.uidColumnName
     val buid = targetTable.buidColumnName
     val oid = targetTable.oidColumnName
@@ -170,7 +182,7 @@ object DeltaWriters {
     }.fold({error => Left(error.getMessage)}, { _ =>
       val updatesWithTechnicalFields =
         updates
-          .getOrCreateColumn(validFrom, lit(currentValue))
+          .setOrCreateColumn(validFrom, lit(currentValue))
           .withColumn(validTo, lit(infiniteValue))
           .withColumn(uid, sha1(concat_ws("_", col(validFrom), col(buid))))
           .withColumn(isCurrent, lit(true))
@@ -203,9 +215,11 @@ object DeltaWriters {
             .as("existing")
             .merge(
               stagedUpdates.as("updates"), s"existing.$buid = updates.mergeKey")
-            .whenMatched(s"existing.$isCurrent = true AND existing.$oid <> updates.$oid")
+            .whenMatched(s"existing.$isCurrent = true AND existing.$oid <> updates.$oid AND existing.$uid <> updates.$uid")
             .updateExpr(Map(isCurrent -> "false", validTo -> s"updates.$validFrom"))
-            .whenNotMatched()
+            .whenMatched(s"existing.$isCurrent = true AND existing.$oid <> updates.$oid AND existing.$uid = updates.$uid")
+            .delete
+            .whenNotMatched
             .insertExpr(
               updatesWithTechnicalFields
                 .drop("mergeKey")

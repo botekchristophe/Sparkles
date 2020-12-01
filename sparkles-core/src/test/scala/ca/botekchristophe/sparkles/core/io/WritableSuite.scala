@@ -6,8 +6,8 @@
 
 package ca.botekchristophe.sparkles.core.io
 
-import java.sql.{Date, Timestamp}
-import java.time.{LocalDate, LocalDateTime}
+import java.sql.Timestamp
+import java.time.LocalDateTime
 import java.util.UUID
 
 import ca.botekchristophe.sparkes.core.file.{FileSystem, LocalFileSystem}

@@ -8,7 +8,7 @@ package ca.botekchristophe.sparkes.core.io
 
 import ca.botekchristophe.sparkes.core.datasources.DataSource
 import ca.botekchristophe.sparkes.core.file.FileSystem
-import ca.botekchristophe.sparkes.core.io.delta.DeltaWriters
+import ca.botekchristophe.sparkes.core.io.delta.DeltaWriter
 import ca.botekchristophe.sparkes.core.tables.{DeltaInsertTable, DeltaScd1Table, DeltaScd2Table, DeltaUpsertTable}
 import cats.implicits._
 import org.apache.spark.sql.DataFrame
@@ -30,28 +30,28 @@ object Writable {
   implicit val deltaTableScd2CanWrite: Writable[DeltaScd2Table] =
     new Writable[DeltaScd2Table] {
       override def writeData(a: DeltaScd2Table, data: DataFrame, fs: FileSystem): Either[String, DataFrame] = {
-        DeltaWriters.scd2(a, data, fs)
+        DeltaWriter.scd2(a, data, fs)
       }
     }
 
   implicit val deltaTableScd1CanWrite: Writable[DeltaScd1Table] =
     new Writable[DeltaScd1Table] {
       override def writeData(a: DeltaScd1Table, data: DataFrame, fs: FileSystem): Either[String, DataFrame] = {
-        DeltaWriters.scd1(a, data, fs)
+        DeltaWriter.scd1(a, data, fs)
       }
     }
 
   implicit val deltaTableUpsertCanWrite: Writable[DeltaUpsertTable] =
     new Writable[DeltaUpsertTable] {
       override def writeData(a: DeltaUpsertTable, data: DataFrame, fs: FileSystem): Either[String, DataFrame] = {
-        DeltaWriters.upsert(a, data, fs)
+        DeltaWriter.upsert(a, data, fs)
       }
     }
 
   implicit val deltaTableInsertCanWrite: Writable[DeltaInsertTable] =
     new Writable[DeltaInsertTable] {
       override def writeData(a: DeltaInsertTable, data: DataFrame, fs: FileSystem): Either[String, DataFrame] = {
-        DeltaWriters.insert(a, data, fs)
+        DeltaWriter.insert(a, data, fs)
       }
     }
 

@@ -7,7 +7,6 @@
 package ca.botekchristophe.sparkes.core.tables
 
 import ca.botekchristophe.sparkes.core.datasources._
-import ca.botekchristophe.sparkes.core.io.InsertMode
 import org.apache.spark.sql.types.StructType
 
 /**
@@ -21,13 +20,14 @@ case class DeltaInsertTable(override val relativePath: String,
                             override val schema: Option[StructType],
                             override val dependencies: Set[DataSource])
 
-  extends FactTable with InsertMode with DataLakeTable {
+  extends InsertTable with DataLakeTable {
 
   /**
    * For some files like JSON or CSV, we might want to set specific readOptions to Spark.
    * Can be empty
    */
   override val readOptions: Map[String, String] = Map.empty[String, String]
+
   /**
    * We might want to set specific writeOptions to Spark when writing raw files.
    * Can be empty

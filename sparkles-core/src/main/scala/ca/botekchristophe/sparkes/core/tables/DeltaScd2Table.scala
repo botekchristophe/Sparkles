@@ -27,6 +27,7 @@ case class DeltaScd2Table(override val relativePath: String,
    * Can be empty
    */
   override val readOptions: Map[String, String] = Map.empty[String, String]
+
   /**
    * We might want to set specific writeOptions to Spark when writing raw files.
    * Can be empty
