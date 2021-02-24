@@ -117,4 +117,31 @@ object LocalFileSystem extends FileSystem {
       case Success(_) => Right()
     }
   }
+
+  /**
+   * move a file to a destination folder.
+   *
+   * @param source      source file path
+   * @param destination destination file path
+   * @param overwrite   flag
+   * @return returns Unit if the copy was successful
+   *         returns an error if the move failed
+   */
+  override def move(source: String, destination: String, overwrite: Boolean): Either[String, Unit] = {
+    Try {
+      val input = new io.File(source)
+      val output = new io.File(destination)
+      if (output.exists() && overwrite) {
+        FileUtils.deleteQuietly(output)
+      }
+      if (input.isDirectory) {
+        FileUtils.moveDirectoryToDirectory(input, output, overwrite)
+      } else {
+        FileUtils.moveFile(input, output)
+      }
+    } match {
+      case Failure(e) => Left(e.getLocalizedMessage)
+      case Success(_) => Right()
+    }
+  }
 }

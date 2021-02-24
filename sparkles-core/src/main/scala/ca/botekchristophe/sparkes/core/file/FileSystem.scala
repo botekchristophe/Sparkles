@@ -53,6 +53,17 @@ trait FileSystem {
   def copy(source: String, destination: String, overwrite: Boolean): Either[String, Unit]
 
   /**
+   * move a file to a destination folder.
+   *
+   * @param source source file path
+   * @param destination destination file path
+   * @param overwrite flag
+   * @return returns Unit if the copy was successful
+   *         returns an error if the move failed
+   */
+  def move(source: String, destination: String, overwrite: Boolean): Either[String, Unit]
+
+  /**
    * Removes file(s)
    * @param path path to the file(s) to remove
    * @return returns Unit if the removal was successful

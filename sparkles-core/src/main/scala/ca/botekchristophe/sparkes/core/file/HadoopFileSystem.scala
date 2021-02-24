@@ -59,7 +59,9 @@ class HadoopFileSystem(bucket: String) extends FileSystem {
    * @return returns Unit if the copy was successful
    *         returns an error if the copy failed
    */
-override def copy(source:  String, destination:  String, overwrite: Boolean): Either[String, Unit] = ???
+override def copy(source:  String, destination:  String, overwrite: Boolean): Either[String, Unit] = {
+  Left("not implemented")
+}
 
   /**
    * Removes file(s)
@@ -68,5 +70,20 @@ override def copy(source:  String, destination:  String, overwrite: Boolean): Ei
    * @return returns Unit if the removal was successful
    *         returns an error if the removal failed
    */
-override def remove(path: String): Either[String, Unit] = ???
+override def remove(path: String): Either[String, Unit] = {
+  Left("not implemented")
+}
+
+  /**
+   * move a file to a destination folder.
+   *
+   * @param source      source file path
+   * @param destination destination file path
+   * @param overwrite   flag
+   * @return returns Unit if the copy was successful
+   *         returns an error if the move failed
+   */
+  override def move(source: String, destination: String, overwrite: Boolean): Either[String, Unit] = {
+    Left("not implemented")
+  }
 }
